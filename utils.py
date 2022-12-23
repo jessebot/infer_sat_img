@@ -1,19 +1,18 @@
-import rasterio as rio
-import rasterio
-import os
-import requests
-import glob
+"""
+This module was provided by Overstory,
+but then modified for style by Jesse Hitch
+"""
+import matplotlib.pyplot as plt
 import numpy as np
-import glob
+import os
+import rasterio
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.utils.data.dataset import Dataset
-from torch.autograd import Variable
 from torch.nn import init
-import random
-import matplotlib.pyplot as plt
-plt.rcParams["figure.figsize"] = (10,10)
+
+
+plt.rcParams["figure.figsize"] = (10, 10)
 
 # UNET MODEL
 # https://github.com/jaxony/unet-pytorch/blob/master/model.py
@@ -242,18 +241,21 @@ class UNet(nn.Module):
             x = module(before_pool, x)
 
         # no activation on the output
-        #x = self.conv_final(x)
+        # x = self.conv_final(x)
         # maybe add the sigmoid here instead of postprocess
         x = F.relu(self.conv_final(x))
 
         return x
 
 
-#UTILS
-
+# UTILS
 def _ensure_opened(ds):
-    "Ensure that `ds` is an opened Rasterio dataset and not a str/pathlike object."
-    return ds if type(ds) == rasterio.io.DatasetReader else rasterio.open(str(ds), "r")
+    """
+    Ensure that `ds` is an opened Rasterio dataset & not a str/pathlike object
+    """
+    if type(ds) != rasterio.io.DatasetReader:
+        rasterio.open(str(ds), "r")
+    return ds
 
 
 def read_crop(ds, crop, bands=None, pad=False):
@@ -267,13 +269,17 @@ def read_crop(ds, crop, bands=None, pad=False):
         A numpy array containing the read image `crop` (bands * h * w).
     """
     ds = _ensure_opened(ds)
-    if pad: raise ValueError('padding not implemented yet.')
+    if pad:
+        raise ValueError('padding not implemented yet.')
+
     if bands is None:
         bands = [i for i in range(1, ds.count+1)]
 
-    #assert len(bands) <= ds.count, "`bands` cannot contain more bands than the number of bands in the dataset."
-    #assert max(bands) <= ds.count, "The maximum value in `bands` should be smaller or equal to the band count."
+    # assert len(bands) <= ds.count, "`bands` cannot contain more bands than the number of bands in the dataset."
+    # assert max(bands) <= ds.count, "The maximum value in `bands` should be smaller or equal to the band count."
+
     window = None
+
     if crop is not None:
         assert len(crop) == 4, "`crop` should be a tuple or list of shape (px, py, w, h)."
         px, py, w, h = crop
@@ -291,7 +297,9 @@ def read_crop(ds, crop, bands=None, pad=False):
         'transform': rasterio.windows.transform(window, ds.transform)})
     return ds.read(bands, window=window), meta
 
-def plot_rgb(img, clip_percentile=(2, 98), clip_values=None, bands=[3, 2, 1], figsize=(20, 20), nodata=None, figtitle=None, crop=None, ax=None):
+
+def plot_rgb(img, clip_percentile=(2, 98), clip_values=None, bands=[3, 2, 1],
+             figsize=(20, 20), nodata=None, figtitle=None, crop=None, ax=None):
     """
     Plot clipped (and optionally cropped) RGB image.
     Args:
@@ -323,11 +331,13 @@ def plot_rgb(img, clip_percentile=(2, 98), clip_values=None, bands=[3, 2, 1], fi
         if crop is not None:
             img = img[:, py:py+h, px:px+w]
     else:
-        raise ValueError("img should be str, rasterio dataset or numpy array. (got {})".format(type(img)))
+        raise ValueError(f"img should be str, rasterio dataset or numpy array. (got {type(img)})")
+
     img = img.astype(float)
     nodata = nodata if nodata is not None else (meta['nodata'] if meta is not None else None)
     if nodata is not None:
         img[img == nodata] = np.nan
+
     if clip_values is not None:
         assert len(clip_values) == 2, "Clip values should have the shape (min value, max value)"
         assert clip_values[0] < clip_values[1], "clip_values[0] should be smaller than clip_values[1]"
@@ -353,46 +363,49 @@ def plot_rgb(img, clip_percentile=(2, 98), clip_values=None, bands=[3, 2, 1], fi
     else:
         ax.imshow(img)
 
-def tif_to_image(path, crop, bands=[1,2,3,4,5,6,7,8,9,10]):
-  tile_size=512 #size model is trained on
-  ds = _ensure_opened(path)
-  image, meta = read_crop(ds, crop, bands=bands)
-  return image, meta
-  
-#same but dont show, only load into numpy array so we can predict on it
+
+def tif_to_image(path, crop, bands=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]):
+    tile_size = 512  # size model is trained on
+    ds = _ensure_opened(path)
+    image, meta = read_crop(ds, crop, bands=bands)
+    return image, meta
+
+
+# same but dont show, only load into numpy array so we can predict on it
 def infer_image(file_path, plot=False):
-  #model_path hardcoded here:
-  model_path='live_model.pickle'
-  ds = _ensure_opened(file_path)
-  image = ds.read()
-  print(image.shape)
-  #data normalization
-  inputs = image[:10, :, :].astype(float)
-  # ugly rescaling
-  for band in range(inputs.shape[0]):
-      # compute 90th percentile
-      perc = np.percentile(inputs[band, :, :], 90)
-      if perc > 0:
-          inputs[band, :, :][inputs[band, :, :] > perc] = perc
-          inputs[band, :, :] = inputs[band, :, :] / perc
-          
+    # model_path hardcoded here:
+    model_path = 'live_model.pickle'
+    ds = _ensure_opened(file_path)
+    image = ds.read()
+    print(image.shape)
 
-  model = UNet(num_classes=1, in_channels=10, depth=5,
-                  start_filts=16, up_mode='transpose',
-                  merge_mode='concat'
-              )
-  checkpoint = torch.load(model_path, map_location=torch.device('cpu'))
-  model.load_state_dict(checkpoint['model_state_dict'])
-  model.eval()
+    # data normalization
+    inputs = image[:10, :, :].astype(float)
 
-  res = model.forward(torch.tensor(np.expand_dims(inputs, 0)).float())
-  res = res.detach().numpy().reshape(512, 512)
-  res[res > 0.5] = 1
-  res[res <= 0.5] = 0
+    # ugly rescaling
+    for band in range(inputs.shape[0]):
+        # compute 90th percentile
+        perc = np.percentile(inputs[band, :, :], 90)
+        if perc > 0:
+            inputs[band, :, :][inputs[band, :, :] > perc] = perc
+            inputs[band, :, :] = inputs[band, :, :] / perc
 
-  if plot:
-    fig, axs = plt.subplots(2)
-    axs[0].imshow(np.transpose(inputs[:3, :, :], (1, 2, 0))) 
-    axs[1].imshow(res, alpha=0.5, cmap='gray', vmin=0, vmax=1)
+    model = UNet(num_classes=1, in_channels=10, depth=5,
+                 start_filts=16, up_mode='transpose',
+                 merge_mode='concat')
 
-  return res
+    checkpoint = torch.load(model_path, map_location=torch.device('cpu'))
+    model.load_state_dict(checkpoint['model_state_dict'])
+    model.eval()
+
+    res = model.forward(torch.tensor(np.expand_dims(inputs, 0)).float())
+    res = res.detach().numpy().reshape(512, 512)
+    res[res > 0.5] = 1
+    res[res <= 0.5] = 0
+
+    if plot:
+        fig, axs = plt.subplots(2)
+        axs[0].imshow(np.transpose(inputs[:3, :, :], (1, 2, 0)))
+        axs[1].imshow(res, alpha=0.5, cmap='gray', vmin=0, vmax=1)
+
+    return res

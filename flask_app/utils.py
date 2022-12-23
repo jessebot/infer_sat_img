@@ -1,6 +1,9 @@
 """
 This module was provided by Overstory,
-but then modified for style by Jesse Hitch
+but then modified for style and comments by Jesse Hitch
+
+# UNET MODEL
+# https://github.com/jaxony/unet-pytorch/blob/master/model.py
 """
 import matplotlib.pyplot as plt
 import numpy as np
@@ -12,10 +15,9 @@ import torch.nn.functional as F
 from torch.nn import init
 
 
+PWD = os.path.dirname(__file__)
+MODEL_PATH = f'{PWD}/models/live_model.pickle'
 plt.rcParams["figure.figsize"] = (10, 10)
-
-# UNET MODEL
-# https://github.com/jaxony/unet-pytorch/blob/master/model.py
 
 
 def conv3x3(in_channels, out_channels, stride=1,
@@ -315,13 +317,16 @@ def plot_rgb(img, clip_percentile=(2, 98), clip_values=None, bands=[3, 2, 1],
         A matplotlib figure.
     """
     meta = None
+
     if isinstance(img, str):
         assert os.path.exists(img), "{} does not exist!".format(img)
         figtitle = os.path.basename(img) if figtitle is None else figtitle
         img = rasterio.open(img)
         img, meta = read_crop(img, crop, bands)
+
     elif isinstance(img, rasterio.io.DatasetReader):
         img, meta = read_crop(img, crop, bands)
+
     elif isinstance(img, np.ndarray):
         assert len(img.shape) <= 3, "Array should have no more than 3 dimensions."
         if len(img.shape) == 2:
@@ -330,6 +335,7 @@ def plot_rgb(img, clip_percentile=(2, 98), clip_values=None, bands=[3, 2, 1],
             img = img[np.array(bands) - 1, :, :]
         if crop is not None:
             img = img[:, py:py+h, px:px+w]
+
     else:
         raise ValueError(f"img should be str, rasterio dataset or numpy array. (got {type(img)})")
 
@@ -345,10 +351,12 @@ def plot_rgb(img, clip_percentile=(2, 98), clip_values=None, bands=[3, 2, 1],
         assert len(clip_percentile) == 2, "Clip_percentile should have the shape (min percentile, max percentile)"
         assert clip_percentile[0] < clip_percentile[1], "clip_percentile[0] should be smaller than clip_percentile[1]"
         clip_values = None if clip_percentile == (0, 100) else [np.nanpercentile(img, clip_percentile[i]) for i in range(2)]
+
     if clip_values is not None:
         img[~np.isnan(img)] = np.clip(img[~np.isnan(img)], *clip_values)
     clip_values = (np.nanmin(img), np.nanmax(img)) if clip_values is None else clip_values
     img[~np.isnan(img)] = (img[~np.isnan(img)] - clip_values[0])/(clip_values[1] - clip_values[0])
+
     if img.shape[0] <= 3:
         img = np.transpose(img, (1, 2, 0))
     alpha = np.all(~np.isnan(img), axis=2)[:,:,np.newaxis].astype(float)
@@ -365,6 +373,10 @@ def plot_rgb(img, clip_percentile=(2, 98), clip_values=None, bands=[3, 2, 1],
 
 
 def tif_to_image(path, crop, bands=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]):
+    """
+    this was unused, so I removed it initially
+    tile_size = 512  # size model is trained on
+    """
     tile_size = 512  # size model is trained on
     ds = _ensure_opened(path)
     image, meta = read_crop(ds, crop, bands=bands)
@@ -373,8 +385,6 @@ def tif_to_image(path, crop, bands=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]):
 
 # same but dont show, only load into numpy array so we can predict on it
 def infer_image(file_path, plot=False):
-    # model_path hardcoded here:
-    model_path = 'live_model.pickle'
     ds = _ensure_opened(file_path)
     image = ds.read()
     print(image.shape)
@@ -394,7 +404,7 @@ def infer_image(file_path, plot=False):
                  start_filts=16, up_mode='transpose',
                  merge_mode='concat')
 
-    checkpoint = torch.load(model_path, map_location=torch.device('cpu'))
+    checkpoint = torch.load(MODEL_PATH, map_location=torch.device('cpu'))
     model.load_state_dict(checkpoint['model_state_dict'])
     model.eval()
 

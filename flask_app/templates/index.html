@@ -1,0 +1,63 @@
+{% include('header_main.html') %}
+
+<div class="container d-flex align-items-center vh-100">
+    <!-- user photo, name, and blurb -->
+    <div class="row">
+        <div class="col-4">
+            <div class="cardclone">
+                <div class='c-title'>
+                    <span class="nf-mdi-account">
+                    </span>
+                About {{ config_vars['name'] }}
+                </div>
+                <hr style="margin-bottom: 0;">
+                <img class="main-img"
+                     src="/static/img/{{ config_vars['profile_image'] }}"
+                     alt="{{ config_vars['profile_image_alt'] }}"
+                     style="width:200px;"
+                     data-toggle="tooltip" data-placement="bottom"
+                     title="{{ config_vars['name'] }}">
+                <br />
+                <div class='c-title'>
+                    <a href="https://pronouns.org/what-and-why"
+                       class="pronouns"
+                       style="color: cornflowerblue;">
+                        Pronouns
+                    </a>: 
+                    <a href="https://pronouns.org/they-them">
+                        {{ config_vars['pronouns'] }}&nbsp;
+                    </a>
+                </div>
+                <p>{{ config_vars['blurb'] }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- social links -->
+    <div class="cardclone">
+        <div class='c-title-social'>Social Links</div>
+        <hr>
+        &nbsp;&nbsp;
+        {% for lnk in social_links %}
+            <a target="_blank"
+               href="{{ social_links[lnk]['URL'] }}"
+               data-toggle="tooltip" data-placement="left"
+               title="{{ lnk }}">
+                <span class="{{ social_links[lnk]['icon'] }}">
+                    &nbsp;&nbsp;
+                </span>
+            </a>
+        {% endfor %}
+        <hr>
+        <div class='c-footer-link'>
+            <a href="{{ config_vars['resume_pdf_URL'] }}"
+               data-toggle="tooltip" data-placement="bottom"
+               title="Download Resume as a PDF">
+                Download Resume
+            </a>
+        </div>
+    </div><!-- /.cardclone -->
+
+</div><!-- /.container MAIN-->
+
+{% include('footer_main.html') %}

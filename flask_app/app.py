@@ -3,7 +3,7 @@
 from flask import Flask
 from flask import render_template
 import logging as log
-from .utils import infer_image
+from utils import infer_image
 import sys
 import yaml
 

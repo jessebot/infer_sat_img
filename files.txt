@@ -1,0 +1,12 @@
+https://20tree-public.s3-eu-west-1.amazonaws.com/candidates/cloudmask/Sentinel2L2A_sen2cor_18TUR_20180812_clouds%3D5.3%25_area%3D99%25.tif
+https://20tree-public.s3-eu-west-1.amazonaws.com/candidates/cloudmask/Sentinel2L2A_sen2cor_31TCG_20171030_clouds%3D16.0%25_area%3D63%25.tif
+https://20tree-public.s3-eu-west-1.amazonaws.com/candidates/cloudmask/Sentinel2L2A_sen2cor_33TVF_20191104_clouds%3D37.8%25_area%3D99%25.tif
+https://20tree-public.s3-eu-west-1.amazonaws.com/candidates/cloudmask/Sentinel2L2A_sen2cor_58KFC_20181021_clouds%3D1.2%25_area%3D100%25.tif
+https://20tree-public.s3-eu-west-1.amazonaws.com/candidates/cloudmask/Sentinel2L2A_sen2cor_30TXR_20190618_clouds%3D1.7%25_area%3D100%25.tif
+https://20tree-public.s3-eu-west-1.amazonaws.com/candidates/cloudmask/Sentinel2L2A_sen2cor_32SNC_20181202_clouds%3D4.1%25_area%3D100%25.tif
+https://20tree-public.s3-eu-west-1.amazonaws.com/candidates/cloudmask/Sentinel2L2A_sen2cor_31PDM_20190911_clouds%3D10.5%25_area%3D100%25.tif
+https://20tree-public.s3-eu-west-1.amazonaws.com/candidates/cloudmask/Sentinel2L2A_sen2cor_21NYC_20171206_clouds%3D43.6%25_area%3D100%25.tif
+https://20tree-public.s3-eu-west-1.amazonaws.com/candidates/cloudmask/Sentinel2L2A_sen2cor_29RPP_20180206_clouds%3D22.8%25_area%3D99%25.tif
+https://20tree-public.s3-eu-west-1.amazonaws.com/candidates/cloudmask/Sentinel2L2A_sen2cor_49RFN_20190806_clouds%3D6.2%25_area%3D99%25.tif
+https://20tree-public.s3-eu-west-1.amazonaws.com/candidates/cloudmask/Sentinel2L2A_sen2cor_28PDU_20180609_clouds%3D0.5%25_area%3D99%25.tif
+https://20tree-public.s3-eu-west-1.amazonaws.com/candidates/cloudmask/Sentinel2L2A_sen2cor_28PDU_20171002_clouds%3D26.2%25_area%3D100%25.tif

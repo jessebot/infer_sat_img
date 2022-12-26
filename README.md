@@ -23,6 +23,7 @@ docker run -it -p 5000:8080 -v /tmp:/tmp infer-sat-image-api:0.0.1
 curl -F '@file=/home/USER/file.tiff' 127.0.0.1:5000/infer_image/0 -o test.pkl
 ```
 
+To test your load your numpy array from the pickle file you can do:
 ```python
 import numpy as np
 np.load('test.pkl', allow_pickle=True)

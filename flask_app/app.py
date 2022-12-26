@@ -69,7 +69,7 @@ def infer_image(gzip):
             res.dump(return_pkl)
             # if gzip != 0:
             #     return_pkl = gzip_file(return_pkl)
-            send_file(return_pkl, as_attachment=True)
+            return send_file(return_pkl, as_attachment=True)
 
     # if they're not posting, show the upload page
     return 'upload a file to this endpoint'

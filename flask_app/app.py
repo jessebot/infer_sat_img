@@ -5,7 +5,7 @@ import gzip as compress
 import logging as log
 from os import path
 import sys
-from utils import infer_image
+import utils 
 from werkzeug.utils import secure_filename
 
 
@@ -34,7 +34,7 @@ def gzip_file(file_to_compress):
     data = fp.read()
     bindata = bytearray(data)
 
-    with gzip.open(f"{file_to_compress}.gz", "wb") as f:
+    with compress.open(f"{file_to_compress}.gz", "wb") as f:
         f.write(bindata)
 
 
@@ -64,7 +64,7 @@ def infer_image(gzip):
             file_location = path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(file_location)
             log.info(f"Recieved file: {filename}")
-            res = infer_image(file_location)
+            res = utils.infer_image(file_location)
             return_pkl = f"{filename}.pkl"
             res.dump(return_pkl)
             if gzip:

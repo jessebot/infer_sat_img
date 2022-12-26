@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: infer-sat-image-api-flask-service
+spec:
+  selector:
+    app: infer-sat-image-api-flask-app
+  ports:
+    - protocol: "TCP"
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: infer-sat-image-api-flask-app
+spec:
+  selector:
+    matchLabels:
+      app: infer-sat-image-api-flask-app
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: infer-sat-image-api-flask-app
+    spec:
+      containers:
+        - name: infer-sat-image-api-flask-app
+          image: infer-sat-image-api:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080

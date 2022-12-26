@@ -28,16 +28,28 @@ app = Flask(__name__, static_folder='static')
 def index():
     """
     single page resume site with downloadable PDF for resume
+    Returns True
     """
     # Grab site specific information - YAML
     log.info("Good morning, sunshine. It's index time 🌞")
-    config_vars = get_config_variables()
-    return render_template('index.html', config_vars=config_vars)
+    return True
+
+
+@app.route('/test')
+def test_post():
+    """
+    single page resume site with downloadable PDF for resume
+    Returns True
+    """
+    # Grab site specific information - YAML
+    log.info("We received the following test image")
+    return True
 
 
 @app.route('/utils/infer_image')
 def infer_sat_image(image_path):
     """
     Infer the satellite image
+    Returns numpyarray
     """
     return infer_image(image_path)

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3.11
 # Jesse Hitch - JesseBot@Linux.com
-from flask import Flask, request, flash, redirect, url_for, send_file
+from flask import Flask, request, flash, redirect, send_file
 import gzip as compress
 import logging as log
 from os import path
 import sys
-import utils 
+import utils
 from werkzeug.utils import secure_filename
 
 
@@ -38,12 +38,12 @@ def gzip_file(file_to_compress):
         f.write(bindata)
 
 
-@app.route('/infer_image/', defaults={'gzip': False})
-@app.route('/infer_image/<bool:gzip>', methods=['GET', 'POST'])
+@app.route('/infer_image/', defaults={'gzip': 0})
+@app.route('/infer_image/<int:gzip>', methods=['GET', 'POST'])
 def infer_image(gzip):
     """
-    Runs utils.infer_image() on uploaded file, and then returns either
-    Defaults to returning res.dumppkl type from ndarry.dump, or gzip
+    Runs utils.infer_image() on file upload
+    Defaults to returning pkl type from ndarry.dump. if gzip != 0 return gzip
     """
     log.info("Accessed /infer_image")
     if request.method == 'POST':
@@ -67,10 +67,9 @@ def infer_image(gzip):
             res = utils.infer_image(file_location)
             return_pkl = f"{filename}.pkl"
             res.dump(return_pkl)
-            if gzip:
+            if gzip != 0:
                 return_pkl = gzip_file(return_pkl)
             return send_file(return_pkl, as_attachment=True)
-
 
     # if they're not posting, show the upload page
     return 'upload a file to this endpoint'

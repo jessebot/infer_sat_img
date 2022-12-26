@@ -15,7 +15,6 @@ log.info("logging config loaded")
 
 UPLOAD_FOLDER = '/tmp/'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'tif', 'tiff'}
-IMAGE_PATH = f'{PWD}/test-full.tif'
 
 
 app = Flask(__name__, static_folder='static')
@@ -65,7 +64,7 @@ def infer_image(gzip):
             file_location = path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(file_location)
             log.info(f"Recieved file: {filename}")
-            res = infer_image(IMAGE_PATH)
+            res = infer_image(file_location)
             return_pkl = f"{filename}.pkl"
             res.dump(return_pkl)
             if gzip:

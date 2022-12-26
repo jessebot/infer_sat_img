@@ -7,20 +7,15 @@ but then cleaned up for style and comments only by Jesse Hitch
 """
 import matplotlib.pyplot as plt
 import numpy as np
-import os
-import rasterio as rio
+from os import path
 import rasterio
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import init
-from torch.utils.data.dataset import Dataset
-from torch.autograd import Variable
-from torch.nn import init
 
 
-PWD = os.path.dirname(__file__)
-MODEL_PATH = f'{PWD}/models/live_model.pickle'
+MODEL_PATH = './live_model.pickle'
 plt.rcParams["figure.figsize"] = (10, 10)
 
 
@@ -328,8 +323,8 @@ def plot_rgb(img, clip_percentile=(2, 98), clip_values=None, bands=[3, 2, 1],
     meta = None
 
     if isinstance(img, str):
-        assert os.path.exists(img), "{} does not exist!".format(img)
-        figtitle = os.path.basename(img) if figtitle is None else figtitle
+        assert path.exists(img), "{} does not exist!".format(img)
+        figtitle = path.basename(img) if figtitle is None else figtitle
         img = rasterio.open(img)
         img, meta = read_crop(img, crop, bands)
 

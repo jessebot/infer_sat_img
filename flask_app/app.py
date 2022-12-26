@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.11
 # Jesse Hitch - JesseBot@Linux.com
 from flask import Flask, request, flash, redirect, send_file
-import gzip as compress
+# import gzip as compress
 import logging as log
 from os import path
 import sys
@@ -26,16 +26,16 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+"""
 def gzip_file(file_to_compress):
-    """
-    quickly gzip a file
-    """
+    # quickly gzip a file
     fp = open(file_to_compress, "rb")
     data = fp.read()
     bindata = bytearray(data)
 
     with compress.open(f"{file_to_compress}.gz", "wb") as f:
         f.write(bindata)
+"""
 
 
 @app.route('/infer_image/', defaults={'gzip': 0})
@@ -67,9 +67,9 @@ def infer_image(gzip):
             res = utils.infer_image(file_location)
             return_pkl = f"{filename}.pkl"
             res.dump(return_pkl)
-            if gzip != 0:
-                return_pkl = gzip_file(return_pkl)
-            return send_file(return_pkl, as_attachment=True)
+            # if gzip != 0:
+            #     return_pkl = gzip_file(return_pkl)
+            send_file(return_pkl, as_attachment=True)
 
     # if they're not posting, show the upload page
     return 'upload a file to this endpoint'

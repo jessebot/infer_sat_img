@@ -1,3 +1,4 @@
 # frontend: we don't need these yet
 templates/*
 *.tif
+.gitignore

@@ -5,13 +5,20 @@ but then cleaned up for style and comments only by Jesse Hitch
 # UNET MODEL
 # https://github.com/jaxony/unet-pytorch/blob/master/model.py
 """
+import glob
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import random
+import rasterio as rio
 import rasterio
+import requests
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.nn import init
+from torch.utils.data.dataset import Dataset
+from torch.autograd import Variable
 from torch.nn import init
 
 
@@ -255,10 +262,15 @@ class UNet(nn.Module):
 def _ensure_opened(ds):
     """
     Ensure that `ds` is an opened Rasterio dataset & not a str/pathlike object
+    # working
+    # return ds if type(ds) == rasterio.io.DatasetReader else rasterio.open(str(ds), "r")
     """
+    # not working
     if type(ds) != rasterio.io.DatasetReader:
-        rasterio.open(str(ds), "r")
-    return ds
+        print("not very rasterio of you")
+        return rasterio.open(str(ds), "r")
+    else:
+        return ds
 
 
 def read_crop(ds, crop, bands=None, pad=False):

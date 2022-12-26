@@ -13,7 +13,7 @@ log.basicConfig(stream=sys.stderr, level=log.INFO)
 log.info("logging config loaded")
 
 UPLOAD_FOLDER = '/tmp/'
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'tif', 'tiff'}
 
 
 app = Flask(__name__, static_folder='static')
@@ -28,6 +28,7 @@ def allowed_file(filename):
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
 
+    log.info("Accessed /upload")
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -44,7 +45,11 @@ def upload_file():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(path.join(app.config['UPLOAD_FOLDER'], filename))
-            return redirect(url_for('upload_file', name=filename))
+            log.info(f"Recieved file: {filename}")
+            # return redirect(url_for('upload_file', name=filename))
+            return infer_image(filename)
+
+    # if they're not posting, show the upload page
     return '''
     <!doctype html>
     <title>Upload new File</title>
@@ -54,15 +59,6 @@ def upload_file():
       <input type=submit value=Upload>
     </form>
     '''
-
-
-@app.route('/utils/infer_image')
-def infer_sat_image(image_path):
-    """
-    Infer the satellite image
-    Returns numpyarray
-    """
-    return infer_image(image_path)
 
 
 if __name__ == '__main__':

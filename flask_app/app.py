@@ -40,7 +40,7 @@ def gzip_file(file_to_compress):
 
 
 @app.route('/infer_image/', defaults={'gzip': False})
-@app.route('/infer_image/<bool:gzip>', methods=['GET', 'POST']):
+@app.route('/infer_image/<bool:gzip>', methods=['GET', 'POST'])
 def infer_image(gzip):
     """
     Runs utils.infer_image() on uploaded file, and then returns either

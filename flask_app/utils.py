@@ -1,6 +1,6 @@
 """
 This module was provided by Overstory,
-but then modified for style and comments by Jesse Hitch
+but then cleaned up for style and comments only by Jesse Hitch
 
 # UNET MODEL
 # https://github.com/jaxony/unet-pytorch/blob/master/model.py
@@ -103,8 +103,7 @@ class UpConv(nn.Module):
                                 mode=self.up_mode)
 
         if self.merge_mode == 'concat':
-            self.conv1 = conv3x3(
-                2 * self.out_channels, self.out_channels)
+            self.conv1 = conv3x3(2 * self.out_channels, self.out_channels)
         else:
             # num of input channels to conv2 is same
             self.conv1 = conv3x3(self.out_channels, self.out_channels)
@@ -127,12 +126,14 @@ class UpConv(nn.Module):
 
 
 class UNet(nn.Module):
-    """ `UNet` class is based on https://arxiv.org/abs/1505.04597
+    """
+    `UNet` class is based on https://arxiv.org/abs/1505.04597
     The U-Net is a convolutional encoder-decoder neural network.
     Contextual spatial information (from the decoding,
     expansive pathway) about an input tensor is merged with
     information representing the localization of details
     (from the encoding, compressive pathway).
+
     Modifications to the original paper:
     (1) padding is used in 3x3 convolutions to prevent loss
         of border pixels

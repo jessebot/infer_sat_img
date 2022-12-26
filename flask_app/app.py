@@ -63,3 +63,7 @@ def infer_sat_image(image_path):
     Returns numpyarray
     """
     return infer_image(image_path)
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')

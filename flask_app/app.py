@@ -1,6 +1,7 @@
 #!/usr/bin/env python3.11
 # Jesse Hitch - JesseBot@Linux.com
-from flask import Flask, request, flash, redirect, url_for
+from flask import Flask, request, flash, redirect, url_for, send_file
+import gzip as compress
 import logging as log
 from os import path
 import sys
@@ -14,6 +15,7 @@ log.info("logging config loaded")
 
 UPLOAD_FOLDER = '/tmp/'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'tif', 'tiff'}
+IMAGE_PATH = f'{PWD}/test-full.tif'
 
 
 app = Flask(__name__, static_folder='static')
@@ -25,10 +27,26 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-@app.route('/upload', methods=['GET', 'POST'])
-def upload_file():
+def gzip_file(file_to_compress):
+    """
+    quickly gzip a file
+    """
+    fp = open(file_to_compress, "rb")
+    data = fp.read()
+    bindata = bytearray(data)
 
-    log.info("Accessed /upload")
+    with gzip.open(f"{file_to_compress}.gz", "wb") as f:
+        f.write(bindata)
+
+
+@app.route('/infer_image/', defaults={'gzip': False})
+@app.route('/infer_image/<bool:gzip>', methods=['GET', 'POST']):
+def infer_image(gzip):
+    """
+    Runs utils.infer_image() on uploaded file, and then returns either
+    Defaults to returning res.dumppkl type from ndarry.dump, or gzip
+    """
+    log.info("Accessed /infer_image")
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -44,21 +62,19 @@ def upload_file():
 
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(path.join(app.config['UPLOAD_FOLDER'], filename))
+            file_location = path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(file_location)
             log.info(f"Recieved file: {filename}")
-            # return redirect(url_for('upload_file', name=filename))
-            return infer_image(filename)
+            res = infer_image(IMAGE_PATH)
+            return_pkl = f"{filename}.pkl"
+            res.dump(return_pkl)
+            if gzip:
+                return_pkl = gzip_file(return_pkl)
+            return send_file(return_pkl, as_attachment=True)
+
 
     # if they're not posting, show the upload page
-    return '''
-    <!doctype html>
-    <title>Upload new File</title>
-    <h1>Upload new File</h1>
-    <form method=post enctype=multipart/form-data>
-      <input type=file name=file>
-      <input type=submit value=Upload>
-    </form>
-    '''
+    return 'upload a file to this endpoint'
 
 
 if __name__ == '__main__':

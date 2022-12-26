@@ -5,11 +5,9 @@ but then cleaned up for style and comments only by Jesse Hitch
 # UNET MODEL
 # https://github.com/jaxony/unet-pytorch/blob/master/model.py
 """
-import glob
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-import random
 import rasterio as rio
 import rasterio
 import torch
@@ -23,7 +21,6 @@ from torch.nn import init
 
 PWD = os.path.dirname(__file__)
 MODEL_PATH = f'{PWD}/models/live_model.pickle'
-IMAGE_PATH = f'{PWD}/cool_tiff_for_dogs.tif'
 plt.rcParams["figure.figsize"] = (10, 10)
 
 
@@ -267,7 +264,6 @@ def _ensure_opened(ds):
     """
     # not working
     if type(ds) != rasterio.io.DatasetReader:
-        print("not very rasterio of you")
         return rasterio.open(str(ds), "r")
     else:
         return ds
@@ -433,5 +429,3 @@ def infer_image(file_path, plot=False):
 
     return res
 
-
-print(infer_image(IMAGE_PATH))

@@ -1,49 +1,59 @@
 #!/usr/bin/env python3.11
 # Jesse Hitch - JesseBot@Linux.com
-from flask import Flask
-from flask import render_template
+from flask import Flask, request, flash, redirect, url_for
 import logging as log
-from utils import infer_image
+from os import path
 import sys
-import yaml
+from utils import infer_image
+from werkzeug.utils import secure_filename
+
 
 # set logging
 log.basicConfig(stream=sys.stderr, level=log.INFO)
 log.info("logging config loaded")
 
-
-def get_config_variables():
-    """
-    Gets config.yaml variables from YAML file. Returns dict.
-    """
-    with open('./config/config.yaml', 'r') as yml_file:
-        doc = yaml.safe_load(yml_file)
-    return doc
+UPLOAD_FOLDER = '/tmp/'
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
 
 app = Flask(__name__, static_folder='static')
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
-@app.route('/')
-def index():
-    """
-    single page resume site with downloadable PDF for resume
-    Returns True
-    """
-    # Grab site specific information - YAML
-    log.info("Good morning, sunshine. It's index time 🌞")
-    return True
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-@app.route('/test')
-def test_post():
-    """
-    single page resume site with downloadable PDF for resume
-    Returns True
-    """
-    # Grab site specific information - YAML
-    log.info("We received the following test image")
-    return True
+@app.route('/upload', methods=['GET', 'POST'])
+def upload_file():
+
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        file = request.files['file']
+
+        # If the user does not select a file, the browser submits an
+        # empty file without a filename.
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(path.join(app.config['UPLOAD_FOLDER'], filename))
+            return redirect(url_for('upload_file', name=filename))
+    return '''
+    <!doctype html>
+    <title>Upload new File</title>
+    <h1>Upload new File</h1>
+    <form method=post enctype=multipart/form-data>
+      <input type=file name=file>
+      <input type=submit value=Upload>
+    </form>
+    '''
 
 
 @app.route('/utils/infer_image')

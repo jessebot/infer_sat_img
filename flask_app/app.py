@@ -14,7 +14,7 @@ log.basicConfig(stream=sys.stderr, level=log.INFO)
 log.info("logging config loaded")
 
 UPLOAD_FOLDER = '/tmp/'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'tif', 'tiff'}
+ALLOWED_EXTENSIONS = {'tif', 'tiff'}
 
 
 app = Flask(__name__, static_folder='static')
@@ -73,7 +73,3 @@ def infer_image(gzip):
 
     # if they're not posting, show the upload page
     return 'upload a file to this endpoint'
-
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0')

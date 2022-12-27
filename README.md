@@ -2,7 +2,7 @@
 You'll find [GCP-arch-options.drawio](./GCP-arch-options.drawio) as well as [a png](./GCP-arch-options.png) in this directory as the diagram requested for the first part of the assignment. My expertise is mostly in on-prem cloud and AWS, but I've also worked with GCP a bit in past roles, so I did my best on this one, but the time limit of 30 minutes didn't leave too much time for research to optimize the services we're using. Instead, I've created some basic examples explaining different ways to optimize generally, after doing some basic research of AWS -> GKE equivilents. The diagram will cover:
 
 - GKE directly
-- Hybrid cloud setup iwth GKE and a local k8s distro
+- Hybrid cloud setup with GKE and a local k8s distro
 - Serverless on GKE (though I would need some more time to actually flesh these out)
 
 Assumption was made that this would be to deploy something similar to the assignment. Please also assume that we would have a mirrored enviornment for both prod and staging.
@@ -40,19 +40,18 @@ python3.11 crop_setellite_image.py -s /path/to/your/sat_tile.tif
 
 Please checkout the python notebook in this repo for some more info and help. This is just a rough setup to get you familiar with everything.
 
-## Testing the app on K8s locally
-
-### Installing a k8s cluster
+## Installing a k8s cluster
 
 <details>
   <summary>➡️  Install a k3s cluster with `smol-k8s-lab`</summary>
 
-#### Using smol-k8s-lab
-I wrote this tool this year for working locally on k8s projects.
-You can check it out on [github](https://github.com/small-hack/smol-k8s-lab).
+### Using [smol-k8s-lab]
+I wrote this tool earlier this year for working locally on k8s projects.
 
-It installs metallb, the nginx ingress controller, and can also install argocd,
-as well as the external secrets provider.
+It installs metallb, the nginx ingress controller, and can optionally install [Argo CD],
+as well as the [External Secrets Operator]. For this assignment though,
+we're mostly interested in the bare bones that smol-k8s-lab can setup for you,
+so we'll save the other features for another time.
 
 ```bash
 pip3.11 install smol-k8s-lab
@@ -70,10 +69,19 @@ echo "email: name@email.com" >> ~/.config/smol-k8s-lab/config.yaml
 # this is the log level, which I set to debug so you can see everything going on
 echo -e "log:\n  level: debug" >> ~/.config/smol-k8s-lab/config.yaml
 
-# k3s is best on Linux (note: torch is not made for macOS and will not run on a mac with no GPU)
+# k3s is best on Linux (note: pytorch is not made for macOS and will not run on a mac with no GPU)
 # NOTE: THIS REQUIRES SUDO ACCESS
 smol-k8s-lab k3s
 ```
+
+#### Note on Networking
+`smol-k8s-lab` will setup your endpoint to run at the first IP available in your
+provided IP range. So, in the above example this would be 192.168.42.42.
+Below, we'll be installing a k8s ingress that uses the hostname: interview.overstory-test.com
+
+This means that after you install the manifests below, you can go into your local router settings and create a local DNS A record entry to have 192.168.42.42 point to interview.overstory-test.com.
+
+Then, if that entry works, you can skip the sections here and in the notebook about port forwarding locally, and replace `127.0.0.1:5000` with `interview.overstory-test.com` in the `curl` examples.
 
 </details>
 
@@ -129,7 +137,8 @@ docker run -it -p 5000:8080 -v /tmp:/tmp jessebot/infer-sat-img-api:0.0.1
 ## testing `infer_image`
 
 ```bash
-curl -F '@file=/home/USER/file.tiff' 127.0.0.1:5000/infer_image/0 -o test.pkl
+# replace /path/to/512crop if you're actual path
+curl -F '@file=/path/to/512crop.tif' 127.0.0.1:5000/infer_image/0 -o test.pkl
 ```
 
 ## Testing the endpoint
@@ -143,7 +152,7 @@ np.load('test.pkl', allow_pickle=True)
 [euporie]: https://github.com/joouha/euporie
 [k3s]: https://k3s.io/
 [zellij]: https://zellij.dev/
-[sixel]: https://wikiless.org/wiki/Sixel?lang=en 
+[sixel]: https://wikiless.org/wiki/Sixel?lang=en
 [smol-k8s-lab]: https://github.com/small-hack/smol-k8s-lab
 [w3m]: https://wikiless.org/wiki/W3m?lang=en
 [vim]: https://www.vim.org/
@@ -152,3 +161,5 @@ np.load('test.pkl', allow_pickle=True)
 [Semshi]: https://github.com/numirias/semshi
 [KinD]: https://kind.sigs.k8s.io/
 [minikube]: https://minikube.sigs.k8s.io/docs/
+[Argo CD]: https://argoproj.github.io/
+[External Secrets Operator]: https://external-secrets.io/

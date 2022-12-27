@@ -1,5 +1,5 @@
 # Assignment - Part 1
-You'll find [GCP-arch-options.drawio](./GCP-arch-options.drawio) in this directory as the diagram requested for the first part of the assignment. My expertise is mostly in local cloud and AWS, but I've also worked with GCP a bit in past roles, so I did my best on this one, but the time limit of 30 minutes didn't leave too much time for research to optomize the services we're using. Instead, I've created some basic examples explaining different ways to optomize generally, including:
+You'll find [GCP-arch-options.drawio](./GCP-arch-options.drawio) as well as [a png](./GCP-arch-options.png) in this directory as the diagram requested for the first part of the assignment. My expertise is mostly in local cloud and AWS, but I've also worked with GCP a bit in past roles, so I did my best on this one, but the time limit of 30 minutes didn't leave too much time for research to optomize the services we're using. Instead, I've created some basic examples explaining different ways to optomize generally, including:
 
 - GKE directly
 - Hybrid cloud setup iwth GKE and a local k8s distro

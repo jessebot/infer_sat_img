@@ -1,15 +1,42 @@
 # Assignment - Part 1
-You'll find [GCP-arch-options.drawio](./GCP-arch-options.drawio) as well as [a png](./GCP-arch-options.png) in this directory as the diagram requested for the first part of the assignment. My expertise is mostly in local cloud and AWS, but I've also worked with GCP a bit in past roles, so I did my best on this one, but the time limit of 30 minutes didn't leave too much time for research to optomize the services we're using. Instead, I've created some basic examples explaining different ways to optomize generally, including:
+You'll find [GCP-arch-options.drawio](./GCP-arch-options.drawio) as well as [a png](./GCP-arch-options.png) in this directory as the diagram requested for the first part of the assignment. My expertise is mostly in on-prem cloud and AWS, but I've also worked with GCP a bit in past roles, so I did my best on this one, but the time limit of 30 minutes didn't leave too much time for research to optimize the services we're using. Instead, I've created some basic examples explaining different ways to optimize generally, after doing some basic research of AWS -> GKE equivilents. The diagram will cover:
 
 - GKE directly
 - Hybrid cloud setup iwth GKE and a local k8s distro
 - Serverless on GKE (though I would need some more time to actually flesh these out)
 
+Assumption was made that this would be to deploy something similar to the assignment. Please also assume that we would have a mirrored enviornment for both prod and staging.
+
+<hr>
+
 # Assignment - Part 2
 
-I spent more time on this, because there were some bugs in the python notebook and I had to get up to speed on pytorch and testing k8s on GPU enabled local metal. It was worth it. This was super fun :D
+I spent more time on this, because there were some bugs in the python notebook and I had to get up to speed on pytorch and testing k8s on *GPU optimized* local metal. It was worth it. This was super fun :D
 
-# Getting started locally
+### Tools used
+
+- tested on a machine running Ubuntu 22.04 LTS with 4 cores and an Nvidia RTX2060
+- libraries in `requirements.txt`:
+  - argparse (take options in script)
+  - flask (serve endpoint)
+  - the Overstory pre-provided `utils.py` as well as the libraries it depended on (e.g. rasterio, pytorch, matplotlib...)
+- [smol-k8s-lab] to quickly get a [k3s] cluster running
+- [k3s] was used as a slim distro that could still scale out (instead of using something like [KinD] or [minikube])
+- [euporie] for viewing and writing notebooks (this worked surprisingly well, but was a bit slow to render the graphics)
+- [iTerm2] and [wezterm] - both making use of [sixel] and their own image libs for graphics/charts in the terminal
+- [zellij] as a terminal multiplexer for managing sessions, tabs, panes, and floating windows in the terminal (especially via SSH)
+- [vim] (text editor) - using the [YouCompleteMe] for LSP, [Semshi] for semantic highlighting, and [ruff] for linting
+- [w3m] (simple browser with [sixel], mostly used for brushing up on docs)
+
+### Before you start
+
+If you have a satellite tile locally, I created a small cli script to crop it in `crop_satellite_img.py` for convienence. The script defaults to the same tile that is downloaded in the assignment notebook, but you can also pass in any other tif like so:
+
+```bash
+python3.11 crop_setellite_image.py -s /path/to/your/sat_tile.tif
+```
+
+# Getting started locally with K8s
 
 Please checkout the python notebook in this repo for some more info and help. This is just a rough setup to get you familiar with everything.
 
@@ -67,8 +94,6 @@ kubectl apply -f k8s_manifests/
 kubectl port-forward deployment/infer-sat-image-flask-app 5000:8080
 ```
 
-If you have a satellite tile locally, I created a small cli script to crop it in `crop_satellite_img.py` for convienence.
-
 In another terminal, try the following where `cropped_img.tif` is replaced by the path to your 512x512 sat image crop:
 ```bash
 # the /0 is a boolean for gzip (meaning do not gzip), I didn't have time to implement the gzip enabled
@@ -113,3 +138,17 @@ To test your load your numpy array from the pickle file you can do:
 import numpy as np
 np.load('test.pkl', allow_pickle=True)
 ```
+
+<!-- references -->
+[euporie]: https://github.com/joouha/euporie
+[k3s]: https://k3s.io/
+[zellij]: https://zellij.dev/
+[sixel]: https://wikiless.org/wiki/Sixel?lang=en 
+[smol-k8s-lab]: https://github.com/small-hack/smol-k8s-lab
+[w3m]: https://wikiless.org/wiki/W3m?lang=en
+[vim]: https://www.vim.org/
+[wezterm]: https://wezfurlong.org/wezterm/
+[YouCompleteMe]: https://github.com/ycm-core/YouCompleteMe
+[Semshi]: https://github.com/numirias/semshi
+[KinD]: https://kind.sigs.k8s.io/
+[minikube]: https://minikube.sigs.k8s.io/docs/

@@ -84,6 +84,8 @@ np.load('test.pkl', allow_pickle=True)
 
 ## Building the Dockerfile and testing locally
 
+The dockerfile is huge, but available [here](https://hub.docker.com/r/jessebot/infer-sat-image-api).
+
 ### Building
 
 ```bash

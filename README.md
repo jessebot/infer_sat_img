@@ -22,6 +22,7 @@ I spent more time on this, because there were some bugs in the python notebook a
   - the Overstory pre-provided `utils.py` as well as the libraries it depended on (e.g. rasterio, pytorch, matplotlib...)
 - [smol-k8s-lab] to quickly get a [k3s] cluster running
 - [k3s] was used as a slim distro that could still scale out (instead of using something like [KinD] or [minikube])
+- [k9s] was used for monitoring the cluster
 - [euporie] for viewing and writing notebooks (this worked surprisingly well, but was a bit slow to render the graphics)
 - [iTerm2] and [wezterm] - both making use of [sixel] and their own image libs for graphics/charts in the terminal
 - [zellij] as a terminal multiplexer for managing sessions, tabs, panes, and floating windows in the terminal (especially via SSH)
@@ -42,9 +43,6 @@ Please checkout the python notebook in this repo for some more info and help. Th
 
 ## Installing a k8s cluster
 
-<details>
-  <summary>➡️  Install a k3s cluster with `smol-k8s-lab`</summary>
-
 ### Using [smol-k8s-lab]
 I wrote this tool earlier this year for working locally on k8s projects.
 
@@ -54,6 +52,7 @@ we're mostly interested in the bare bones that smol-k8s-lab can setup for you,
 so we'll save the other features for another time.
 
 ```bash
+# this should install everything you need, but checkout smol-k8s-lab --help for extra tooling
 pip3.11 install smol-k8s-lab
 
 # make sure you create this config directory (will be automated soon)
@@ -63,7 +62,7 @@ mkdir -p ~/.config/smol-k8s-lab
 # you can setup an A record for your domain in your pihole 'local DNS' if you're using that, or ping me, and I can help you with your local router!
 echo -e "metallb_address_pool:\n  - 192.168.42.42/32" > ~/.config/smol-k8s-lab/config.yaml
 
-# this is used for SSL with lets encrypt
+# this is used for SSL with Lets Encrypt - change to your email if you'd like to play with SSL
 echo "email: name@email.com" >> ~/.config/smol-k8s-lab/config.yaml
 
 # this is the log level, which I set to debug so you can see everything going on
@@ -82,8 +81,6 @@ Below, we'll be installing a k8s ingress that uses the hostname: interview.overs
 This means that after you install the manifests below, you can go into your local router settings and create a local DNS A record entry to have 192.168.42.42 point to interview.overstory-test.com.
 
 Then, if that entry works, you can skip the sections here and in the notebook about port forwarding locally, and replace `127.0.0.1:5000` with `interview.overstory-test.com` in the `curl` examples.
-
-</details>
 
 ### Installing the manifests
 
@@ -149,17 +146,19 @@ np.load('test.pkl', allow_pickle=True)
 ```
 
 <!-- references -->
+[Argo CD]: https://argoproj.github.io/
 [euporie]: https://github.com/joouha/euporie
+[External Secrets Operator]: https://external-secrets.io/
 [k3s]: https://k3s.io/
-[zellij]: https://zellij.dev/
+[KinD]: https://kind.sigs.k8s.io/
+[k9s]: https://k9scli.io/
+[minikube]: https://minikube.sigs.k8s.io/docs/
+[ruff]: https://pypi.org/project/ruff/
+[Semshi]: https://github.com/numirias/semshi
 [sixel]: https://wikiless.org/wiki/Sixel?lang=en
 [smol-k8s-lab]: https://github.com/small-hack/smol-k8s-lab
 [w3m]: https://wikiless.org/wiki/W3m?lang=en
 [vim]: https://www.vim.org/
 [wezterm]: https://wezfurlong.org/wezterm/
 [YouCompleteMe]: https://github.com/ycm-core/YouCompleteMe
-[Semshi]: https://github.com/numirias/semshi
-[KinD]: https://kind.sigs.k8s.io/
-[minikube]: https://minikube.sigs.k8s.io/docs/
-[Argo CD]: https://argoproj.github.io/
-[External Secrets Operator]: https://external-secrets.io/
+[zellij]: https://zellij.dev/

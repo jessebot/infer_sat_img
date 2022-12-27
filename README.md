@@ -149,6 +149,7 @@ np.load('test.pkl', allow_pickle=True)
 [Argo CD]: https://argoproj.github.io/
 [euporie]: https://github.com/joouha/euporie
 [External Secrets Operator]: https://external-secrets.io/
+[iTerm2]: https://iterm2.com/
 [k3s]: https://k3s.io/
 [KinD]: https://kind.sigs.k8s.io/
 [k9s]: https://k9scli.io/

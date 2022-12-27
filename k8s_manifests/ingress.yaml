@@ -1,0 +1,26 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: infer-image
+  annotations:
+    # this will need to be increased for larger images
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    nginx.ingress.kuberentes.io/proxy-max-temp-file-size: "100m"
+    ingress.kubernetes.io/client-max-body-size: "100m"
+    nginx.ingress.kubernetes.io/client-max-body-size: "100m"
+    nginx.org/client-max-body-size: "100m"
+spec:
+  ingressClassName: nginx
+  rules:
+    # this can be anything you want :) if running locally.
+    - host: interview.overstory-test.com
+      http:
+        paths:
+          - path: /infer_image
+            pathType: Prefix
+            backend:
+              service:
+                name: infer-sat-image-flask-service
+                port:
+                  number: 80

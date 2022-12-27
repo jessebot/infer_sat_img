@@ -1,0 +1,6 @@
+flask
+pyyaml
+matplotlib
+rasterio
+torch
+gunicorn

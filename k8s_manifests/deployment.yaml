@@ -1,0 +1,21 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: infer-sat-image-flask-app
+spec:
+  selector:
+    matchLabels:
+      app: infer-sat-image-flask-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: infer-sat-image-flask-app
+    spec:
+      containers:
+        - name: infer-sat-image-flask
+          image: jessebot/infer-sat-image-api:0.2.4
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080

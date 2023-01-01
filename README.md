@@ -13,13 +13,17 @@ Assumption was made that this would be to deploy something similar to the assign
 
 I spent more time on this, because there were some bugs in the python notebook and I had to get up to speed on pytorch and testing k8s on *GPU optimized* local metal. It was worth it. This was super fun :D
 
+Note: An earlier version of this repo did not include the GPU optimized Dockerfile, but it should be there now, alone with links on how to install the Nvidia drivers for your host  machine.
+
 ### Tools used
 
 - tested on a machine running Ubuntu 22.04 LTS with 4 cores and an Nvidia RTX2060
+  - Note: I've included both an unoptimized and GPU-optimized Docker images for this assignement, this way you can still test if you have no available GPU.
 - libraries in `requirements.txt`:
   - argparse (take options in script)
   - flask (serve endpoint)
   - the Overstory pre-provided `utils.py` as well as the libraries it depended on (e.g. rasterio, pytorch, matplotlib...)
+- [docker] as well as nvidia's docker.
 - [smol-k8s-lab] to quickly get a [k3s] cluster running
 - [k3s] was used as a slim distro that could still scale out (instead of using something like [KinD] or [minikube])
 - [k9s] was used for monitoring the cluster
@@ -114,7 +118,14 @@ np.load('test.pkl', allow_pickle=True)
 
 ## Building the Dockerfile and testing locally
 
-The dockerfile is huge, but available [here](https://hub.docker.com/r/jessebot/infer-sat-image-api).
+The docker images are huge, but available here:
+
+- [Docker image for machine with no GPU](https://hub.docker.com/r/jessebot/infer-sat-image-api).
+- [Docker image for machine with nvidia GPU](https://hub.docker.com/r/jessebot/).
+
+Unfortunately, I don't have the hardware to test GPUs that aren't nvidia at this time.
+
+If you want to use the GPU optimized image above, you need to first install the [nvidia drivers] on your local machine. Note that you do not need to install the CUDA Toolkit on the host system, but the NVIDIA driver needs to be installed. You can learn more at the [NVIDIA/nvidia-docker](https://github.com/NVIDIA/nvidia-docker) github repo.
 
 ### Building
 
@@ -147,6 +158,7 @@ np.load('test.pkl', allow_pickle=True)
 
 <!-- references -->
 [Argo CD]: https://argoproj.github.io/
+[docker]: https://www.docker.com/
 [euporie]: https://github.com/joouha/euporie
 [External Secrets Operator]: https://external-secrets.io/
 [iTerm2]: https://iterm2.com/
@@ -154,6 +166,7 @@ np.load('test.pkl', allow_pickle=True)
 [KinD]: https://kind.sigs.k8s.io/
 [k9s]: https://k9scli.io/
 [minikube]: https://minikube.sigs.k8s.io/docs/
+[nvidia drivers]: https://docs.nvidia.com/datacenter/tesla/tesla-installation-notes/index.html
 [ruff]: https://pypi.org/project/ruff/
 [Semshi]: https://github.com/numirias/semshi
 [sixel]: https://wikiless.org/wiki/Sixel?lang=en

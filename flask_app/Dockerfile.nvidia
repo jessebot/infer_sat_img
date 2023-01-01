@@ -2,10 +2,11 @@ FROM nvidia/cuda:11.3.0-devel-ubuntu20.04
 ENV TZ=Europe/Amsterdam
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-RUN apt-get update && apt-get install -y software-properties-common gcc && \
-    add-apt-repository -y ppa:deadsnakes/ppa
-
-RUN apt-get update && apt-get install -y python3.11 python3-pip
+RUN apt-get update && \
+    apt-get install -y software-properties-common gcc && \
+    add-apt-repository -y ppa:deadsnakes/ppa && \
+    apt-get update && \
+    apt-get install -y python3.11 python3-pip
 
 # after testing: this could be optomized by putting it all on one line
 COPY *.py ./

@@ -129,27 +129,64 @@ If you want to use the GPU optimized image above, you need to first install the 
 
 ### Building
 
+#### Unoptimized Docker Image
 ```bash
-# 0.0.1 can be any version, but remember to tick it up when testing a new build
-docker build . -t jessebot/infer-sat-img-api:0.0.1
+# 0.2.4 can be any version, but remember to tick it up when testing a new build
+docker build . -t jessebot/infer-sat-image-api:0.2.4
+```
+
+### GPU Optimized Docker Image
+
+```bash
+docker build . -t jessebot/infer-sat-image-api:0.2.4-cuda -f Dockerfile.nvidia
 ```
 
 ### Running locally
 
+#### Unoptimized Docker Image
+
 ```bash
 # forward port 8080 in the docker image to your host port 5000
-# mount the container /tmp directory as a volume to your local /tmp directory
-docker run -it -p 5000:8080 -v /tmp:/tmp jessebot/infer-sat-img-api:0.0.1
+# Optional: mounting the container /tmp directory as a volume to your local /tmp
+docker run -it -p 5000:8080 -v /tmp:/tmp jessebot/infer-sat-image-api:0.2.4
 ```
 
-## testing `infer_image`
+### GPU Optimized Docker Image
+
+```bash
+# forward port 8080 in the docker image to your host port 5000
+# Optional: mounting the container /tmp directory as a volume to your local /tmp
+# Very important: --gpus all
+docker run -it -p 5000:8080 -v /tmp:/tmp --gpus all jessebot/infer-sat-image-api:0.2.4-cuda
+```
+
+## Testing the `infer_image` endpoint
 
 ```bash
 # replace /path/to/512crop if you're actual path
 curl -F '@file=/path/to/512crop.tif' 127.0.0.1:5000/infer_image/0 -o test.pkl
 ```
 
-## Testing the endpoint
+### Benchmarking GPU optimization
+
+You can run the following to benchmark the Docker image:
+
+```bash
+time curl -F "file=@cropped_img.tif" http://127.0.0.1:5000/infer_image/0 --output test_response.pkl
+```
+
+Which should output something like this (0.285 seconds):
+```bash
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 6154k  100 1031k  100 5123k  3715k  18.0M --:--:-- --:--:-- --:--:-- 21.6M
+
+real    0m0.285s
+user    0m0.000s
+sys     0m0.012s
+```
+
+## Testing the pickle file
 To test your load your numpy array from the pickle file you can do:
 ```python
 import numpy as np

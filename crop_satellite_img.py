@@ -26,9 +26,9 @@ def crop_img(sat_tile=SAT_TILE, width=512, height=512, x_pos=0, y_pos=0):
     Creates a cropped image from a larger satellite image
     Saves image called cropped_img_{width}x{height}at{x_pos}x{y_pos}y.tif
                      ┌───────────────────────┐
-                     │ ┌─── width ──────┐    │
-                     │ │ ☁  🌳 ☁  ☁     H    │
-                     │ │  ☁  ☁      ☁   e    │
+                     │ ┌─── width ──────┐    │ 
+                     │ │ ☁  🌳 ☁  ☁     H    │ 
+                     │ │  ☁  ☁      ☁   e    │ 
     satellite img ➡  │ │         🌳     i    │↕
                      │ │🌳 Cropped img  g    │y-axis for location of crop
                      │ │                h    │
@@ -37,7 +37,6 @@ def crop_img(sat_tile=SAT_TILE, width=512, height=512, x_pos=0, y_pos=0):
                      │                       │
                      └───────────────────────┘
                      ↔ x-axis for location of crop
-
     Optional args:
         sat_tile -  which is a filename of a satelite tif
         width    -  width of the crop you want to create
@@ -66,12 +65,18 @@ def crop_img(sat_tile=SAT_TILE, width=512, height=512, x_pos=0, y_pos=0):
 
 if __name__ == '__main__':
     # parse args
-    pars = argparse.ArgumentParser()
+    pars = argparse.ArgumentParser(prog='create_satellite_img.py',
+                                   description="Create 🌾🌾🌾🌾 from 🛰️  🖼️ ",
+                                   epilog='Mostly written by Overstory, '
+                                          'but also Jesse a little bit.')
+
     pars.add_argument("--crop_width", "-w", type=int, default='512',
-                      help="Width for the crop. Defaults to 512.")
+                      help="Width for the crop. Defaults to 512. "
+                           "(must be increment of 64)")
 
     pars.add_argument("--crop_height", "-H", type=int, default='512',
-                      help="Height for the crop. Defaults to 512.")
+                      help="Height for the crop. Defaults to 512. "
+                           "(must be increment of 64)")
 
     pars.add_argument("--x_position", "-x", type=int, default='0',
                       help="Position on the x-axis to place crop. Default: 0")

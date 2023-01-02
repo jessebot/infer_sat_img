@@ -1,10 +1,11 @@
 """
 This module was provided by Overstory,
-but then cleaned up for style and comments only by Jesse Hitch
+but then cleaned up for style and comments by Jesse Hitch
 
 # UNET MODEL
 # https://github.com/jaxony/unet-pytorch/blob/master/model.py
 """
+import logging as log
 import matplotlib.pyplot as plt
 import numpy as np
 from os import path
@@ -381,17 +382,18 @@ def tif_to_image(path, crop, bands=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]):
     this was unused, so I removed it initially
     tile_size = 512  # size model is trained on
     """
-    tile_size = 512  # size model is trained on
     ds = _ensure_opened(path)
     image, meta = read_crop(ds, crop, bands=bands)
     return image, meta
 
 
-# same but dont show, only load into numpy array so we can predict on it
 def infer_image(file_path, plot=False):
+    """
+    same but dont show, only load into numpy array so we can predict on it
+    """
     ds = _ensure_opened(file_path)
     image = ds.read()
-    print(image.shape)
+    log.info(f"image shape is: {str(image.shape)}")
 
     # data normalization
     inputs = image[:10, :, :].astype(float)
@@ -408,12 +410,16 @@ def infer_image(file_path, plot=False):
                  start_filts=16, up_mode='transpose',
                  merge_mode='concat')
 
+    log.info(f"torch.cuda.is_available: {torch.cuda.is_available()}")
+    log.info(f"torch.cuda.device_count: {torch.cuda.device_count()}")
+    log.info(f"torch.cuda.current_device: {torch.cuda.current_device()}")
+
     checkpoint = torch.load(MODEL_PATH, map_location=torch.device('cpu'))
     model.load_state_dict(checkpoint['model_state_dict'])
     model.eval()
 
     res = model.forward(torch.tensor(np.expand_dims(inputs, 0)).float())
-    res = res.detach().numpy().reshape(512, 512)
+    res = res.detach().numpy().reshape(image.shape[1], image.shape[2])
     res[res > 0.5] = 1
     res[res <= 0.5] = 0
 

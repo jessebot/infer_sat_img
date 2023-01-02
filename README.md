@@ -13,12 +13,12 @@ Assumption was made that this would be to deploy something similar to the assign
 
 I spent more time on this, because there were some bugs in the python notebook and I had to get up to speed on pytorch and testing k8s on *GPU optimized* local metal. It was worth it. This was super fun :D
 
-Note: An earlier version of this repo did not include the GPU optimized Dockerfile, but it should be there now, alone with links on how to install the Nvidia drivers for your host  machine.
+Note: An earlier version of this repo did not include the GPU enabled Dockerfile, but it should be there now, alone with links on how to install the Nvidia drivers for your host  machine.
 
 ### Tools used
 
 - tested on a machine running Ubuntu 22.04 LTS with 4 cores and an Nvidia RTX2060
-  - Note: I've included both an unoptimized and GPU-optimized Docker images for this assignement, this way you can still test if you have no available GPU.
+  - Note: I've included both an unoptimized and GPU enabled Docker images for this assignement, this way you can still test if you have no available GPU.
 - libraries in `requirements.txt`:
   - argparse (take options in script)
   - flask (serve endpoint)
@@ -119,23 +119,24 @@ np.load('test.pkl', allow_pickle=True)
 ## Building the Dockerfile and testing locally
 
 The docker images are huge, but available here:
+[hub.docker.com/r/jessebot/infer-sat-image-api](https://hub.docker.com/r/jessebot/infer-sat-image-api)
 
-- [Docker image for machine with no GPU](https://hub.docker.com/r/jessebot/infer-sat-image-api).
-- [Docker image for machine with nvidia GPU](https://hub.docker.com/r/jessebot/).
+Pull `infer-sat-image-api:0.2.4` for a default build.
 
-Unfortunately, I don't have the hardware to test GPUs that aren't nvidia at this time.
+Pull `infer-sat-image-api:0.2.4-` for a GPU enabled build.
 
-If you want to use the GPU optimized image above, you need to first install the [nvidia drivers] on your local machine. Note that you do not need to install the CUDA Toolkit on the host system, but the NVIDIA driver needs to be installed. You can learn more at the [NVIDIA/nvidia-docker](https://github.com/NVIDIA/nvidia-docker) github repo.
+If you want to use the GPU enabled image above, you need to first install the [nvidia drivers] on your local machine. You can learn more at the [NVIDIA/nvidia-docker](https://github.com/NVIDIA/nvidia-docker) github repo. Note: Do not be fooled by their documentation examples with outdated version examples. Always lookup your specific GPU model for Linux [here](https://www.nvidia.com/download/index.aspx?lang=en-us). You'll also need the [NVIDIA Container ToolKit].
 
 ### Building
 
-#### Unoptimized Docker Image
+#### Default Docker Image
+
 ```bash
 # 0.2.4 can be any version, but remember to tick it up when testing a new build
 docker build . -t jessebot/infer-sat-image-api:0.2.4
 ```
 
-### GPU Optimized Docker Image
+### GPU Enabled Docker Image
 
 ```bash
 docker build . -t jessebot/infer-sat-image-api:0.2.4-cuda -f Dockerfile.nvidia
@@ -143,7 +144,7 @@ docker build . -t jessebot/infer-sat-image-api:0.2.4-cuda -f Dockerfile.nvidia
 
 ### Running locally
 
-#### Unoptimized Docker Image
+#### Default Docker Image
 
 ```bash
 # forward port 8080 in the docker image to your host port 5000
@@ -151,7 +152,7 @@ docker build . -t jessebot/infer-sat-image-api:0.2.4-cuda -f Dockerfile.nvidia
 docker run -it -p 5000:8080 -v /tmp:/tmp jessebot/infer-sat-image-api:0.2.4
 ```
 
-### GPU Optimized Docker Image
+### GPU Enabled Docker Image
 
 ```bash
 # forward port 8080 in the docker image to your host port 5000
@@ -204,6 +205,7 @@ np.load('test.pkl', allow_pickle=True)
 [k9s]: https://k9scli.io/
 [minikube]: https://minikube.sigs.k8s.io/docs/
 [nvidia drivers]: https://docs.nvidia.com/datacenter/tesla/tesla-installation-notes/index.html
+[NVIDIA Container ToolKit]: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html
 [ruff]: https://pypi.org/project/ruff/
 [Semshi]: https://github.com/numirias/semshi
 [sixel]: https://wikiless.org/wiki/Sixel?lang=en

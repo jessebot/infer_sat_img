@@ -7,8 +7,9 @@ RUN apt-get update && \
     apt-get install -y software-properties-common gcc && \
     add-apt-repository -y ppa:deadsnakes/ppa && \
     apt-get update && \
-    apt-get install -y python3.11 python3-pip
+    apt-get install -y python3.11
 
+RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
 COPY requirements.txt requirements.txt
 
 RUN pip3.11 install -r requirements.txt && rm -rf /root/.cache/pip/

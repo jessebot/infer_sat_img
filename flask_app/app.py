@@ -72,7 +72,7 @@ def infer_image(gzip):
             res = utils.infer_image(file_location, plot=False, use_gpu=GPU)
 
             # dump the numpy array to a pkl
-            return_pkl = f"{filename}.pkl"
+            return_pkl = filename.replace('tif', 'pkl')
             log.info(f"Creating pickle for numpy array in: {return_pkl}")
             res.dump(return_pkl)
 

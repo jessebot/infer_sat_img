@@ -2,7 +2,7 @@
 # Jesse Hitch - JesseBot@Linux.com
 from flask import Flask, request, flash, redirect, send_file
 # import gzip as compress
-from os import path
+from os import path, environ
 from werkzeug.utils import secure_filename
 from app_logger import log
 # utils should use logger above now
@@ -10,6 +10,7 @@ import utils
 
 
 UPLOAD_FOLDER = '/tmp/'
+GPU = environ.get('GPU', False)
 
 
 app = Flask(__name__, static_folder='static')
@@ -44,7 +45,7 @@ def infer_image(gzip):
     Runs utils.infer_image() on file upload
     Defaults to returning pkl type from ndarry.dump. if gzip != 0: return gzip
     """
-    log.info("Accessed /infer_image")
+    log.info("Accessed /infer_image/")
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -52,8 +53,7 @@ def infer_image(gzip):
             return redirect(request.url)
         file = request.files['file']
 
-        # If the user does not select a file, the browser submits an
-        # empty file without a filename.
+        # if no file selected
         if file.filename == '':
             flash('No selected file')
             return redirect(request.url)
@@ -69,11 +69,15 @@ def infer_image(gzip):
             log.info(f"Saved file: {filename}")
 
             # run the infer_image function for the assignment
-            res = utils.infer_image(file_location)
+            res = utils.infer_image(file_location, plot=False, use_gpu=GPU)
+
+            # dump the numpy array to a pkl
             return_pkl = f"{filename}.pkl"
+            log.info(f"Creating pickle for numpy array in: {return_pkl}")
             res.dump(return_pkl)
-            # if gzip != 0:
-            #     return_pkl = gzip_file(return_pkl)
+
+            # return file to user
+            log.info(f"Returning pickle over HTTP: {return_pkl}")
             return send_file(return_pkl, as_attachment=True)
 
     # if they're not posting, show the upload page

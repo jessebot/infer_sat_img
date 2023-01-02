@@ -255,14 +255,8 @@ class UNet(nn.Module):
 def _ensure_opened(ds):
     """
     Ensure that `ds` is an opened Rasterio dataset & not a str/pathlike object
-    # working
-    # return ds if type(ds) == rasterio.io.DatasetReader else rasterio.open(str(ds), "r")
     """
-    # not working
-    if type(ds) != rasterio.io.DatasetReader:
-        return rasterio.open(str(ds), "r")
-    else:
-        return ds
+    return ds if type(ds) == rasterio.io.DatasetReader else rasterio.open(str(ds), "r")
 
 
 def read_crop(ds, crop, bands=None, pad=False):
@@ -290,18 +284,20 @@ def read_crop(ds, crop, bands=None, pad=False):
     if crop is not None:
         assert len(crop) == 4, "`crop` should be a tuple or list of shape (px, py, w, h)."
         px, py, w, h = crop
+        log.info(f"px:{px} py:{py} w:{w} h:{h}")
         w = ds.width - px if (px + w) > ds.width else w
         h = ds.height - py if (py + h) > ds.height else h
         assert (px + w) <= ds.width, "The crop (px + w) is larger than the dataset width."
         assert (py + h) <= ds.height, "The crop (py + h) is larger than the dataset height."
         window = rasterio.windows.Window(px, py, w, h)
+
     meta = ds.meta
     meta.update(count=len(bands))
     if crop is not None:
         meta.update({
-        'height': window.height,
-        'width': window.width,
-        'transform': rasterio.windows.transform(window, ds.transform)})
+            'height': window.height,
+            'width': window.width,
+            'transform': rasterio.windows.transform(window, ds.transform)})
     return ds.read(bands, window=window), meta
 
 
@@ -379,7 +375,7 @@ def plot_rgb(img, clip_percentile=(2, 98), clip_values=None, bands=[3, 2, 1],
 
 def tif_to_image(path, crop, bands=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]):
     """
-    this was unused, so I removed it initially
+    this was unused, so I removed it:
     tile_size = 512  # size model is trained on
     """
     ds = _ensure_opened(path)
@@ -387,7 +383,7 @@ def tif_to_image(path, crop, bands=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]):
     return image, meta
 
 
-def infer_image(file_path, plot=False):
+def infer_image(file_path, plot=False, use_gpu=False):
     """
     same but dont show, only load into numpy array so we can predict on it
     """
@@ -410,15 +406,23 @@ def infer_image(file_path, plot=False):
                  start_filts=16, up_mode='transpose',
                  merge_mode='concat')
 
-    log.info(f"torch.cuda.is_available: {torch.cuda.is_available()}")
-    log.info(f"torch.cuda.device_count: {torch.cuda.device_count()}")
-    log.info(f"torch.cuda.current_device: {torch.cuda.current_device()}")
+    if use_gpu:
+        log.info(f"torch.cuda.is_available: {torch.cuda.is_available()}")
+        log.info(f"torch.cuda.device_count: {torch.cuda.device_count()}")
+        log.info(f"torch.cuda.current_device: {torch.cuda.current_device()}")
+        device = 'cuda'
+    else:
+        device = 'cpu'
 
-    checkpoint = torch.load(MODEL_PATH, map_location=torch.device('cpu'))
+    log.info(f"Torch device is: {device}")
+
+    checkpoint = torch.load(MODEL_PATH, map_location=torch.device(device))
     model.load_state_dict(checkpoint['model_state_dict'])
     model.eval()
 
+    log.info("Beginning tensor work...")
     res = model.forward(torch.tensor(np.expand_dims(inputs, 0)).float())
+    log.info("model.forward(torch.tensor(np.expand_dims()) finished.")
     res = res.detach().numpy().reshape(image.shape[1], image.shape[2])
     res[res > 0.5] = 1
     res[res <= 0.5] = 0

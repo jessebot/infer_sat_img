@@ -121,9 +121,9 @@ np.load('test.pkl', allow_pickle=True)
 The docker images are huge, but available here:
 [hub.docker.com/r/jessebot/infer-sat-image-api](https://hub.docker.com/r/jessebot/infer-sat-image-api)
 
-Pull `infer-sat-image-api:0.2.4` for a default build.
+Pull `infer-sat-image-api:0.3.1` for a default build.
 
-Pull `infer-sat-image-api:0.2.4-` for a GPU enabled build.
+Pull `infer-sat-image-api:0.3.1-nvidia-pytorch` for a GPU enabled build.
 
 If you want to use the GPU enabled image above, you need to first install the [nvidia drivers] on your local machine. You can learn more at the [NVIDIA/nvidia-docker](https://github.com/NVIDIA/nvidia-docker) github repo. Note: Do not be fooled by their documentation examples with outdated version examples. Always lookup your specific GPU model for Linux [here](https://www.nvidia.com/download/index.aspx?lang=en-us). You'll also need the [NVIDIA Container ToolKit].
 
@@ -132,14 +132,14 @@ If you want to use the GPU enabled image above, you need to first install the [n
 #### Default Docker Image
 
 ```bash
-# 0.2.4 can be any version, but remember to tick it up when testing a new build
-docker build . -t jessebot/infer-sat-image-api:0.2.4
+# 0.3.1 can be any current version, but remember to tick it up when testing a new build
+docker build . -t jessebot/infer-sat-image-api:0.3.1
 ```
 
 ### GPU Enabled Docker Image
 
 ```bash
-docker build . -t jessebot/infer-sat-image-api:0.2.4-cuda -f Dockerfile.nvidia
+docker build . -t jessebot/infer-sat-image-api:0.3.1-nvidia-pytorch -f Dockerfile.nvidia
 ```
 
 ### Running locally
@@ -149,7 +149,7 @@ docker build . -t jessebot/infer-sat-image-api:0.2.4-cuda -f Dockerfile.nvidia
 ```bash
 # forward port 8080 in the docker image to your host port 5000
 # Optional: mounting the container /tmp directory as a volume to your local /tmp
-docker run -it -p 5000:8080 -v /tmp:/tmp jessebot/infer-sat-image-api:0.2.4
+docker run -it -p 5000:8080 -v /tmp:/tmp jessebot/infer-sat-image-api:0.3.1
 ```
 
 ### GPU Enabled Docker Image
@@ -158,7 +158,7 @@ docker run -it -p 5000:8080 -v /tmp:/tmp jessebot/infer-sat-image-api:0.2.4
 # forward port 8080 in the docker image to your host port 5000
 # Optional: mounting the container /tmp directory as a volume to your local /tmp
 # Very important: --gpus all
-docker run -it -p 5000:8080 -v /tmp:/tmp --gpus all jessebot/infer-sat-image-api:0.2.4-cuda
+docker run -it -p 5000:8080 -v /tmp:/tmp --gpus all jessebot/infer-sat-image-api:0.3.1-nvidia-pytorch
 ```
 
 ## Testing the `infer_image` endpoint

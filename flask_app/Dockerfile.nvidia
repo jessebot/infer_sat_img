@@ -1,5 +1,6 @@
 FROM nvcr.io/nvidia/pytorch:22.12-py3
 ENV TZ=Europe/Amsterdam
+ENV GPU="True"
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # have to install python3.11 because the base container still ships 3.8

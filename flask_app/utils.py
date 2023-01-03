@@ -107,6 +107,7 @@ class UpConv(nn.Module):
         else:
             # num of input channels to conv2 is same
             self.conv1 = conv3x3(self.out_channels, self.out_channels)
+
         self.conv2 = conv3x3(self.out_channels, self.out_channels)
 
     def forward(self, from_down, from_up):
@@ -148,9 +149,8 @@ class UNet(nn.Module):
         the tranpose convolution (specified by upmode='transpose')
     """
 
-    def __init__(self, num_classes, in_channels=3, depth=5,
-                 start_filts=64, up_mode='transpose',
-                 merge_mode='concat'):
+    def __init__(self, num_classes, in_channels=3, depth=5, start_filts=64,
+                 up_mode='transpose', merge_mode='concat'):
         """
         Arguments:
             in_channels: int, number of channels in the input tensor.
@@ -167,25 +167,22 @@ class UNet(nn.Module):
         if up_mode in ('transpose', 'upsample'):
             self.up_mode = up_mode
         else:
-            raise ValueError("\"{}\" is not a valid mode for "
-                             "upsampling. Only \"transpose\" and "
-                             "\"upsample\" are allowed.".format(up_mode))
+            raise ValueError(f'"{up_mode}" is not a valid mode for upsampling.'
+                             'Only "transpose" and "upsample" are allowed.')
 
         if merge_mode in ('concat', 'add'):
             self.merge_mode = merge_mode
         else:
-            raise ValueError("\"{}\" is not a valid mode for"
-                             "merging up and down paths. "
-                             "Only \"concat\" and "
-                             "\"add\" are allowed.".format(up_mode))
+            raise ValueError(f'"{merge_mode}" is not a valid mode for merging '
+                             'up and down paths. Only "concat" and "add" are '
+                             'allowed.')
 
         # NOTE: up_mode 'upsample' is incompatible with merge_mode 'add'
         if self.up_mode == 'upsample' and self.merge_mode == 'add':
-            raise ValueError("up_mode \"upsample\" is incompatible "
-                             "with merge_mode \"add\" at the moment "
-                             "because it doesn't make sense to use "
-                             "nearest neighbour to reduce "
-                             "depth channels (by half).")
+            raise ValueError('up_mode "upsample" is incompatible with '
+                             'merge_mode "add" at the moment, because it does'
+                             'not make sense to use nearest neighbour to '
+                             'reduce depth channels (by half).')
 
         self.num_classes = num_classes
         self.in_channels = in_channels
@@ -408,8 +405,7 @@ def infer_image(file_path, plot=False, use_gpu=False):
 
     if use_gpu:
         log.info(f"torch.cuda.is_available: {torch.cuda.is_available()}")
-        log.info(f"torch.cuda.device_count: {torch.cuda.device_count()}")
-        log.info(f"torch.cuda.current_device: {torch.cuda.current_device()}")
+        log.info(f"torch.cuda.get_device_name: {torch.cuda.get_device_name()}")
         device = 'cuda'
     else:
         device = 'cpu'
@@ -422,7 +418,7 @@ def infer_image(file_path, plot=False, use_gpu=False):
 
     log.info("Beginning tensor work...")
     res = model.forward(torch.tensor(np.expand_dims(inputs, 0)).float())
-    log.info("model.forward(torch.tensor(np.expand_dims()) finished.")
+    log.info("Starting numpy reshape...")
     res = res.detach().numpy().reshape(image.shape[1], image.shape[2])
     res[res > 0.5] = 1
     res[res <= 0.5] = 0

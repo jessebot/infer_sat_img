@@ -39,7 +39,7 @@ Note: An earlier version of this repo did not include the GPU enabled Dockerfile
 If you have a satellite tile locally, I created a small cli script to crop it in `crop_satellite_img.py` for convienence. The script defaults to the same tile that is downloaded in the assignment notebook, but you can also pass in any other tif like so:
 
 ```bash
-python3.11 crop_setellite_image.py -s /path/to/your/sat_tile.tif
+python3.11 crop_satellite_img.py -s /path/to/your/sat_tile.tif
 ```
 
 # Getting started locally with K8s

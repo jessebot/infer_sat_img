@@ -410,14 +410,18 @@ def infer_image(file_path, plot=False, use_gpu=False):
     else:
         device = 'cpu'
 
-    log.info(f"Torch device is: {device}")
+    log.info(f"Torch device should be: {device}")
 
     checkpoint = torch.load(MODEL_PATH, map_location=torch.device(device))
     model.load_state_dict(checkpoint['model_state_dict'])
     model.eval()
 
     log.info("Beginning tensor work...")
-    res = model.forward(torch.tensor(np.expand_dims(inputs, 0)).float())
+    tensor = torch.tensor(np.expand_dims(inputs, 0)).float()
+
+    log.info(tensor.device)
+    res = model.forward(tensor)
+
     log.info("Starting numpy reshape...")
     res = res.detach().numpy().reshape(image.shape[1], image.shape[2])
     res[res > 0.5] = 1
@@ -429,4 +433,3 @@ def infer_image(file_path, plot=False, use_gpu=False):
         axs[1].imshow(res, alpha=0.5, cmap='gray', vmin=0, vmax=1)
 
     return res
-

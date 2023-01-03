@@ -16,7 +16,6 @@ SAT_TILE = './Sentinel2L2A_sen2cor_18TUR_20180812_clouds=5.3%_area=99%.tif'
 # set logging before we import the utils, so it uses the same basic config
 FORMAT = '%(asctime)s [%(levelname)s] %(funcName)s: %(message)s'
 log.basicConfig(stream=stderr, format=FORMAT, level=log.INFO)
-log.info("Infer Sat Image Logging Config Loaded.")
 
 from flask_app import utils  # noqa: E402 - needs to load after logging
 
@@ -26,9 +25,9 @@ def crop_img(sat_tile=SAT_TILE, width=512, height=512, x_pos=0, y_pos=0):
     Creates a cropped image from a larger satellite image
     Saves image called cropped_img_{width}x{height}at{x_pos}x{y_pos}y.tif
                      ┌───────────────────────┐
-                     │ ┌─── width ──────┐    │ 
-                     │ │ ☁  🌳 ☁  ☁     H    │ 
-                     │ │  ☁  ☁      ☁   e    │ 
+                     │ ┌─── width ──────┐    │
+                     │ │ ☁  🌳 ☁  ☁     H    │
+                     │ │  ☁  ☁      ☁   e    │
     satellite img ➡  │ │         🌳     i    │↕
                      │ │🌳 Cropped img  g    │y-axis for location of crop
                      │ │                h    │
@@ -47,12 +46,11 @@ def crop_img(sat_tile=SAT_TILE, width=512, height=512, x_pos=0, y_pos=0):
     if not sat_tile.endswith(".tif"):
         raise Exception("Only tif types allowed at this time.")
 
-    # crop = (5000, 5000, width, height)
+    # was: crop = (5000, 5000, 512, 512)
     crop = (x_pos, y_pos, width, height)
 
     log.info(f"{crop}")
 
-    # second time
     image, meta = utils.tif_to_image(sat_tile, crop=crop)
 
     cropped_tif = f'cropped_img_{width}x{height}at{x_pos}x{y_pos}y.tif'

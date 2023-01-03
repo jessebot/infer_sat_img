@@ -345,6 +345,7 @@ def plot_rgb(img, clip_percentile=(2, 98), clip_values=None, bands=[3, 2, 1],
     if clip_values is not None:
         assert len(clip_values) == 2, "Clip values should have the shape (min value, max value)"
         assert clip_values[0] < clip_values[1], "clip_values[0] should be smaller than clip_values[1]"
+
     elif clip_percentile is not None:
         assert len(clip_percentile) == 2, "Clip_percentile should have the shape (min percentile, max percentile)"
         assert clip_percentile[0] < clip_percentile[1], "clip_percentile[0] should be smaller than clip_percentile[1]"
@@ -376,6 +377,7 @@ def tif_to_image(path, crop, bands=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]):
     tile_size = 512  # size model is trained on
     """
     ds = _ensure_opened(path)
+    log.info(f"Shape of image we recieved is: {ds.read().shape}")
     image, meta = read_crop(ds, crop, bands=bands)
     return image, meta
 

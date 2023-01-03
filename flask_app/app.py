@@ -26,24 +26,11 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
 
-"""
-def gzip_file(file_to_compress):
-    # quickly gzip a file
-    fp = open(file_to_compress, "rb")
-    data = fp.read()
-    bindata = bytearray(data)
-
-    with compress.open(f"{file_to_compress}.gz", "wb") as f:
-        f.write(bindata)
-"""
-
-
-@app.route('/infer_image/', defaults={'gzip': 0})
-@app.route('/infer_image/<int:gzip>', methods=['GET', 'POST'])
-def infer_image(gzip):
+@app.route('/infer_image/', methods=['GET', 'POST'])
+def infer_image():
     """
     Runs utils.infer_image() on file upload
-    Defaults to returning pkl type from ndarry.dump. if gzip != 0: return gzip
+    Defaults to returning pickle from ndarry.dump
     """
     log.info("Accessed /infer_image/")
     if request.method == 'POST':

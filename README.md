@@ -31,7 +31,8 @@ Note: An earlier version of this repo did not include the GPU enabled Dockerfile
 - [iTerm2] and [wezterm] - both making use of [sixel] and their own image libs for graphics/charts in the terminal
 - [zellij] as a terminal multiplexer for managing sessions, tabs, panes, and floating windows in the terminal (especially via SSH)
 - [vim] (text editor) - using the [YouCompleteMe] for LSP, [Semshi] for semantic highlighting, and [ruff] for linting
-- [w3m] (simple browser with [sixel], mostly used for brushing up on docs)
+- [w3m] (simple browser with [sixel], mostly used for brushing upon docs)
+- GitHub Actions - CI/CD for building and pushing the docker image
 
 ### Before you start
 
@@ -72,7 +73,7 @@ echo "email: name@email.com" >> ~/.config/smol-k8s-lab/config.yaml
 # this is the log level, which I set to debug so you can see everything going on
 echo -e "log:\n  level: debug" >> ~/.config/smol-k8s-lab/config.yaml
 
-# k3s is best on Linux (note: pytorch is not made for macOS and will not run on a mac with no GPU)
+# k3s is best on Linux (note: pytorch does not have a good time in KinD)
 # NOTE: THIS REQUIRES SUDO ACCESS
 smol-k8s-lab k3s
 ```
@@ -121,25 +122,27 @@ np.load('test.pkl', allow_pickle=True)
 The docker images are huge, but available here:
 [hub.docker.com/r/jessebot/infer-sat-image-api](https://hub.docker.com/r/jessebot/infer-sat-image-api)
 
-Pull `infer-sat-image-api:0.3.1` for a default build.
+Pull `infer-sat-image-api:0.3.2` for a default build.
 
-Pull `infer-sat-image-api:0.3.1-nvidia-pytorch` for a GPU enabled build.
+Pull `infer-sat-image-api:0.3.2-nvidia` for a GPU enabled build.
 
 If you want to use the GPU enabled image above, you need to first install the [nvidia drivers] on your local machine. You can learn more at the [NVIDIA/nvidia-docker](https://github.com/NVIDIA/nvidia-docker) github repo. Note: Do not be fooled by their documentation examples with outdated version examples. Always lookup your specific GPU model for Linux [here](https://www.nvidia.com/download/index.aspx?lang=en-us). You'll also need the [NVIDIA Container ToolKit].
+
+There's still more to be done in making all the tensors use the cuda device, but I did start that process, however would need a data scientist to double check the code for all posible places we'd need to set the tensor device, or if it's okay to set the default device to something like `cuda.TensorFloat`. Happy to chat more on this one.
 
 ### Building
 
 #### Default Docker Image
 
 ```bash
-# 0.3.1 can be any current version, but remember to tick it up when testing a new build
-docker build . -t jessebot/infer-sat-image-api:0.3.1
+# 0.3.2 can be any current version, but remember to tick it up when testing a new build
+docker build . -t jessebot/infer-sat-image-api:0.3.2
 ```
 
 ### GPU Enabled Docker Image
 
 ```bash
-docker build . -t jessebot/infer-sat-image-api:0.3.1-nvidia-pytorch -f Dockerfile.nvidia
+docker build . -t jessebot/infer-sat-image-api:0.3.2-nvidia -f Dockerfile.nvidia
 ```
 
 ### Running locally
@@ -149,7 +152,7 @@ docker build . -t jessebot/infer-sat-image-api:0.3.1-nvidia-pytorch -f Dockerfil
 ```bash
 # forward port 8080 in the docker image to your host port 5000
 # Optional: mounting the container /tmp directory as a volume to your local /tmp
-docker run -it -p 5000:8080 -v /tmp:/tmp jessebot/infer-sat-image-api:0.3.1
+docker run -it -p 5000:8080 -v /tmp:/tmp jessebot/infer-sat-image-api:0.3.2
 ```
 
 ### GPU Enabled Docker Image
@@ -158,14 +161,14 @@ docker run -it -p 5000:8080 -v /tmp:/tmp jessebot/infer-sat-image-api:0.3.1
 # forward port 8080 in the docker image to your host port 5000
 # Optional: mounting the container /tmp directory as a volume to your local /tmp
 # Very important: --gpus all
-docker run -it -p 5000:8080 -v /tmp:/tmp --gpus all jessebot/infer-sat-image-api:0.3.1-nvidia-pytorch
+docker run -it -p 5000:8080 -v /tmp:/tmp --gpus all jessebot/infer-sat-image-api:0.3.2-nvidia
 ```
 
 ## Testing the `infer_image` endpoint
 
 ```bash
 # replace /path/to/512crop if you're actual path
-curl -F '@file=/path/to/512crop.tif' 127.0.0.1:5000/infer_image/0 -o test.pkl
+curl -F '@file=/path/to/512crop.tif' 127.0.0.1:5000/infer_image -o test.pkl
 ```
 
 ### Benchmarking GPU optimization
@@ -173,18 +176,18 @@ curl -F '@file=/path/to/512crop.tif' 127.0.0.1:5000/infer_image/0 -o test.pkl
 You can run the following to benchmark the Docker image:
 
 ```bash
-time curl -F "file=@cropped_img.tif" http://127.0.0.1:5000/infer_image/0 --output test_response.pkl
+time curl -F "file=@/path/to/512crop.tif" http://127.0.0.1:5000/infer_image --output test_response.pkl
 ```
 
-Which should output something like this (0.285 seconds):
+Which should output something _like_ this (0.235 seconds):
 ```bash
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
 100 6154k  100 1031k  100 5123k  3715k  18.0M --:--:-- --:--:-- --:--:-- 21.6M
 
-real    0m0.285s
-user    0m0.000s
-sys     0m0.012s
+real    0m0.235s
+user    0m0.003s
+sys     0m0.008s
 ```
 
 ## Testing the pickle file

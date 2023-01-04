@@ -39,6 +39,10 @@ Note: An earlier version of this repo did not include the GPU enabled Dockerfile
 If you have a satellite tile locally, I created a small cli script to crop it in `crop_satellite_img.py` for convienence. The script defaults to the same tile that is downloaded in the assignment notebook, but you can also pass in any other tif like so:
 
 ```bash
+# install the requirements
+pip3.11 install -r ./flask_app/requirements.txt
+
+# Optional: Generate a crop to test
 python3.11 crop_satellite_img.py -s /path/to/your/sat_tile.tif
 ```
 

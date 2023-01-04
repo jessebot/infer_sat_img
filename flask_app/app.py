@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.11
 # Jesse Hitch - JesseBot@Linux.com
-from flask import Flask, request, flash, redirect, send_file
+from flask import Flask, request, redirect, send_file, url_for
 # import gzip as compress
 from os import path, environ
 from werkzeug.utils import secure_filename
@@ -15,6 +15,8 @@ GPU = environ.get('GPU', False)
 
 app = Flask(__name__, static_folder='static')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+# Set the secret key to some random bytes. Keep this really secret!
+app.secret_key = b'8754hfpOdF329rZhn'
 
 
 def allowed_file(filename):
@@ -34,15 +36,16 @@ def infer_image():
     """
     log.info("Accessed /infer_image/")
     if request.method == 'POST':
+        log.info(request)
         # check if the post request has the file part
         if 'file' not in request.files:
-            flash('No file part')
+            log.info('No file part')
             return redirect(request.url)
         file = request.files['file']
 
         # if no file selected
         if file.filename == '':
-            flash('No selected file')
+            log.info('No selected file')
             return redirect(request.url)
 
         if file and allowed_file(file.filename):

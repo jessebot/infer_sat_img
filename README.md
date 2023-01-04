@@ -115,7 +115,7 @@ kubectl port-forward deployment/infer-sat-image-flask-app 5000:8080
 In another terminal, try the following where `cropped_img.tif` is replaced by the path to your 512x512 sat image crop:
 ```bash
 # the /0 is a boolean for gzip (meaning do not gzip), I didn't have time to implement the gzip enabled
-curl -F '@file=cropped_img_512x512at0x0y.tif' 127.0.0.1:5000/infer_image/ -o test.pkl
+curl -F 'file=@cropped_img_512x512at0x0y.tif' 127.0.0.1:5000/infer_image/ -o test.pkl
 ```
 
 To test your load your numpy array from the pickle file you can do:
@@ -176,7 +176,7 @@ docker run -it -p 5000:8080 -v /tmp:/tmp --gpus all jessebot/infer-sat-image-api
 
 ```bash
 # replace /path/to/512crop if you're actual path
-curl -F '@file=/path/to/512crop.tif' 127.0.0.1:5000/infer_image -o test.pkl
+curl -F 'file=@/path/to/512crop.tif' 127.0.0.1:5000/infer_image -o test.pkl
 ```
 
 ### Benchmarking GPU optimization

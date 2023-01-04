@@ -17,9 +17,10 @@ Note: An earlier version of this repo did not include the GPU enabled Dockerfile
 
 ### Tools used
 
-- tested on a machine running Ubuntu 22.04 LTS with 4 cores and an Nvidia RTX2060
-  - Note: I've included both an unoptimized and GPU enabled Docker images for this assignement, this way you can still test if you have no available GPU.
-- libraries in `requirements.txt`:
+- tested on metal (4C/8T, 16GB Mem, and a bit on an Nvidia RTX2060) running:
+  - Ubuntu 22.04 LTS
+  - Debian 12 Bookworm
+- libraries in [`./flask_app/requirements.txt`](./flask_app/requirements.txt):
   - argparse (take options in script)
   - flask (serve endpoint)
   - the Overstory pre-provided `utils.py` as well as the libraries it depended on (e.g. rasterio, pytorch, matplotlib...)
@@ -43,6 +44,9 @@ If you have a satellite tile locally, I created a small cli script to crop it in
 pip3.11 install -r ./flask_app/requirements.txt
 
 # Optional: Generate a crop to test
+# Note, BASH doesn't like special characaters, so this might fail:
+# Sentinel2L2A_sen2cor_18TUR_20180812_clouds\=5.3%_area\=99%.tif sentinel_test.tif
+# Just rename the file to something without backslashes and percents
 python3.11 crop_satellite_img.py -s /path/to/your/sat_tile.tif
 ```
 
@@ -84,12 +88,12 @@ smol-k8s-lab k3s
 
 #### Note on Networking
 `smol-k8s-lab` will setup your endpoint to run at the first IP available in your
-provided IP range. So, in the above example this would be 192.168.42.42.
-Below, we'll be installing a k8s ingress that uses the hostname: interview.overstory-test.com
+provided IP range. So, in the above example, this would be 192.168.42.42 (but you could set any IP that suited your network). Below, we'll be installing a k8s ingress resource that uses the hostname:
+interview.overstory-test.com
 
 This means that after you install the manifests below, you can go into your local router settings and create a local DNS A record entry to have 192.168.42.42 point to interview.overstory-test.com.
 
-Then, if that entry works, you can skip the sections here and in the notebook about port forwarding locally, and replace `127.0.0.1:5000` with `interview.overstory-test.com` in the `curl` examples.
+Then, if that entry works, you can skip the sections here, and in the notebook, about port forwarding locally, and replace `127.0.0.1:5000` with `interview.overstory-test.com` in the `curl` examples.
 
 ### Installing the manifests
 
@@ -111,7 +115,7 @@ kubectl port-forward deployment/infer-sat-image-flask-app 5000:8080
 In another terminal, try the following where `cropped_img.tif` is replaced by the path to your 512x512 sat image crop:
 ```bash
 # the /0 is a boolean for gzip (meaning do not gzip), I didn't have time to implement the gzip enabled
-curl -F '@file=cropped_img.tif' 127.0.0.1:5000/infer_image/0 -o test.pkl
+curl -F '@file=cropped_img_512x512at0x0y.tif' 127.0.0.1:5000/infer_image/ -o test.pkl
 ```
 
 To test your load your numpy array from the pickle file you can do:

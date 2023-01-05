@@ -29,12 +29,13 @@ def allowed_file(filename):
 
 
 @app.route('/infer_image/', methods=['GET', 'POST'])
-def infer_image():
+@app.route('/infer_image', methods=['GET', 'POST'])
+def infer_image_route():
     """
     Runs utils.infer_image() on file upload
     Defaults to returning pickle from ndarry.dump
     """
-    log.info("Accessed /infer_image/")
+    log.info("Accessed /infer_image")
     if request.method == 'POST':
         log.info(request)
         # check if the post request has the file part

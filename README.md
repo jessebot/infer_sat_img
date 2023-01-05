@@ -1,11 +1,28 @@
 # Assignment - Part 1
-You'll find [GCP-arch-options.drawio](./GCP-arch-options.drawio) as well as [a png](./GCP-arch-options.png) in this directory as the diagram requested for the first part of the assignment. My expertise is mostly in on-prem cloud and AWS, but I've also worked with GCP a bit in past roles, so I did my best on this one, but the time limit of 30 minutes didn't leave too much time for research to optimize the services we're using. Instead, I've created some basic examples explaining different ways to optimize generally, after doing some basic research of AWS -> GKE equivilents. The diagram will cover:
+You'll find [GCP-arch-options.drawio](./diagrams/GCP-arch-options.drawio) as well as a few [pngs](./diagrams) in this directory as the diagram requested for the first part of the assignment. My expertise is mostly in on-prem cloud and AWS, but I've also worked with GCP a bit in past roles, so I did my best on this one, but the time limit of 30 minutes didn't leave too much time for research to optimize the services we're using. Instead, I've created some basic examples explaining different ways to optimize generally, after doing some basic research of AWS -> GKE equivilents. The diagrams will cover:
 
-- GKE directly
-- Hybrid cloud setup with GKE and a local k8s distro
-- Serverless on GKE (though I would need some more time to actually flesh these out)
+<details>
+  <summary>GKE directly</summary>
 
-Assumption was made that this would be to deploy something similar to the assignment. Please also assume that we would have a mirrored enviornment for both prod and staging.
+  <img src="./diagrams/pure_gke.png" alt="diagram of GKE" width="800">
+
+</details>
+
+<details>
+  <summary>Hybrid cloud setup with GKE and a local k8s distro</summary>
+
+  <img src="./diagrams/hybrid_cloud_gke.png" alt="diagram of hybrid cloud" width="800">
+
+</details>
+
+<details>
+  <summary>Serverless</summary>
+
+  <img src="./diagrams/pure_severless.png" alt="diagram of severless arch" width="800">
+
+</details>
+
+Assumption was made that this would be to deploy something similar to the assignment. Please also assume that we would have a mirrored enviornment for both prod and staging (or any other additional environments needed such as 'development').
 
 <hr>
 

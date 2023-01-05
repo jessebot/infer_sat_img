@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: infer-sat-image-flask
-          image: jessebot/infer-sat-image-api:0.3.2
+          image: jessebot/infer-sat-image-api:0.3.3
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
